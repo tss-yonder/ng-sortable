@@ -73,7 +73,8 @@
             isPlaceHolderPresent,//is placeholder present.
             isDisabled = false, // drag enabled
             escapeListen, // escape listen event
-            isLongTouch = false; //long touch disabled.
+            isLongTouch = false, //long touch disabled.
+            dragLockedHorizontally = false;
 
           hasTouch = 'ontouchstart' in $window;
           isIOS = /iPad|iPhone|iPod/.test($window.navigator.userAgent) && !$window.MSStream;
@@ -85,23 +86,27 @@
           scope.itemScope = itemController.scope;
           element.data('_scope', scope); // #144, work with angular debugInfoEnabled(false)
 
-          scope.$watchGroup(['sortableScope.isDisabled', 'sortableScope.options.longTouch'],
+          scope.$watchGroup(['sortableScope.isDisabled', 'sortableScope.options.longTouch', 'sortableScope.options.dragLockedHorizontally'],
               function (newValues) {
-            if (isDisabled !== newValues[0]) {
-              isDisabled = newValues[0];
-              if (isDisabled) {
-                unbindDrag();
-              } else {
-                bindDrag();
-              }
-            } else if (isLongTouch !== newValues[1]) {
-              isLongTouch = newValues[1];
-              unbindDrag();
-              bindDrag();
-            } else {
-              bindDrag();
-            }
-          });
+                  if (newValues[2] !== undefined && newValues[2] !== dragLockedHorizontally) {
+                    dragLockedHorizontally = newValues[2];
+                  }
+
+                  if (isDisabled !== newValues[0]) {
+                    isDisabled = newValues[0];
+                    if (isDisabled) {
+                      unbindDrag();
+                    } else {
+                      bindDrag();
+                    }
+                  } else if (isLongTouch !== newValues[1]) {
+                    isLongTouch = newValues[1];
+                    unbindDrag();
+                    bindDrag();
+                  } else {
+                    bindDrag();
+                  }
+                });
 
           scope.$on('$destroy', function () {
             angular.element($document[0].body).unbind('keydown', escapeListen);
@@ -241,7 +246,7 @@
             }
 
             containment.append(dragElement);
-            $helper.movePosition(eventObj, dragElement, itemPosition, containment, containerPositioning, scrollableContainer);
+            $helper.movePosition(eventObj, dragElement, itemPosition, containment, containerPositioning, scrollableContainer, dragLockedHorizontally);
 
             scope.sortableScope.$apply(function () {
               scope.callbacks.dragStart(dragItemInfo.eventArgs());
@@ -348,7 +353,7 @@
               targetElement = angular.element($document[0].elementFromPoint(targetX, targetY));
               dragElement.removeClass(sortableConfig.hiddenClass);
 
-              $helper.movePosition(eventObj, dragElement, itemPosition, containment, containerPositioning, scrollableContainer);
+              $helper.movePosition(eventObj, dragElement, itemPosition, containment, containerPositioning, scrollableContainer, dragLockedHorizontally);
 
               //Set Class as dragging starts
               dragElement.addClass(sortableConfig.dragging);
