@@ -246,7 +246,7 @@
             }
 
             containment.append(dragElement);
-            $helper.movePosition(eventObj, dragElement, itemPosition, containment, containerPositioning, scrollableContainer, dragLockedHorizontally);
+            $helper.movePosition(eventObj, dragElement, itemPosition, containment, containerPositioning, scrollableContainer, placeHolder.position(), dragLockedHorizontally);
 
             scope.sortableScope.$apply(function () {
               scope.callbacks.dragStart(dragItemInfo.eventArgs());
@@ -353,7 +353,7 @@
               targetElement = angular.element($document[0].elementFromPoint(targetX, targetY));
               dragElement.removeClass(sortableConfig.hiddenClass);
 
-              $helper.movePosition(eventObj, dragElement, itemPosition, containment, containerPositioning, scrollableContainer, dragLockedHorizontally);
+              $helper.movePosition(eventObj, dragElement, itemPosition, containment, containerPositioning, scrollableContainer, undefined, dragLockedHorizontally);
 
               //Set Class as dragging starts
               dragElement.addClass(sortableConfig.dragging);

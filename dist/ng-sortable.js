@@ -206,11 +206,14 @@
          * @param container - the bounding container.
          * @param containerPositioning - absolute or relative positioning.
          * @param {Object} [scrollableContainer] (optional) Scrollable container object
+         * @param placeHolderPosition contains {left, top} positions of the placeholder item that is being created when the item is being moved.
+         * @param dragLockedHorizontally - if true then placeHolderPosition is being used to position element horizontally.
          */
-        movePosition: function (event, element, pos, container, containerPositioning, scrollableContainer, dragLockedHorizontally) {
+        movePosition: function (event, element, pos, container, containerPositioning, scrollableContainer, placeHolderPosition, dragLockedHorizontally) {
           var bounds;
           var useRelative = (containerPositioning === 'relative');
-
+          var initialElementXVal = element.x;
+          
           element.x = event.pageX - pos.offsetX;
           element.y = event.pageY - pos.offsetY;
 
@@ -234,10 +237,10 @@
             }
 
             element.y = event.clientY - this.offset(element).height;
+          }
 
-            if (dragLockedHorizontally) {
-              element.x = pos.startX;
-            }
+          if (dragLockedHorizontally) {
+            element.x = placeHolderPosition !== undefined ? placeHolderPosition.left : initialElementXVal;
           }
 
           element.css({
@@ -803,7 +806,7 @@
             }
 
             containment.append(dragElement);
-            $helper.movePosition(eventObj, dragElement, itemPosition, containment, containerPositioning, scrollableContainer, dragLockedHorizontally);
+            $helper.movePosition(eventObj, dragElement, itemPosition, containment, containerPositioning, scrollableContainer, placeHolder.position(), dragLockedHorizontally);
 
             scope.sortableScope.$apply(function () {
               scope.callbacks.dragStart(dragItemInfo.eventArgs());
@@ -910,7 +913,7 @@
               targetElement = angular.element($document[0].elementFromPoint(targetX, targetY));
               dragElement.removeClass(sortableConfig.hiddenClass);
 
-              $helper.movePosition(eventObj, dragElement, itemPosition, containment, containerPositioning, scrollableContainer, dragLockedHorizontally);
+              $helper.movePosition(eventObj, dragElement, itemPosition, containment, containerPositioning, scrollableContainer, undefined, dragLockedHorizontally);
 
               //Set Class as dragging starts
               dragElement.addClass(sortableConfig.dragging);
