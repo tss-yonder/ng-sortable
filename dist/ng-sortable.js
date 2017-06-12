@@ -690,13 +690,14 @@
            * @param event - the event object.
            */
           dragListen = function (event) {
-
+            scope.itemScope.element.addClass('as-sortable-is-ready-to-move');
             var unbindMoveListen = function () {
               angular.element($document).unbind('mousemove', moveListen);
               angular.element($document).unbind('touchmove', moveListen);
               element.unbind('mouseup', unbindMoveListen);
               element.unbind('touchend', unbindMoveListen);
               element.unbind('touchcancel', unbindMoveListen);
+              scope.itemScope.element.removeClass('as-sortable-is-ready-to-move');
             };
 
             var startPosition;
